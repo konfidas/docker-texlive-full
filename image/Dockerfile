@@ -1,16 +1,13 @@
 #
-# thomasweise/docker-texlive-full
+# konfidas/docker-texlive-full
 #
-# This is an image with a full TeX Live installation and several
-# fonts and tools.
-# Source: http://github.com/thomasWeise/docker-texlive-full/
+# This image bases on  http://github.com/thomasWeise/docker-texlive-full/
 # License: GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 # The license applies to the way the image is built, while the
 # software components inside the image are under the respective
 # licenses chosen by their respective copyright holders.
 #
 FROM ubuntu:20.10
-MAINTAINER Thomas Weise <tweise@hfuu.edu.cn>
 
 ENV LANG=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
@@ -44,6 +41,8 @@ RUN echo "Initial update." &&\
     echo "Installing utilities and nice fonts for Chinese and others." &&\
     apt-get install -f -y --no-install-recommends \
           curl \
+          wget \
+          exiftool \
           emacs-intl-fonts \
           fontconfig \
           fonts-arphic-bkai00mp \
@@ -72,16 +71,6 @@ RUN echo "Initial update." &&\
           xfonts-intl-chinese \
           xfonts-intl-chinese-big \
           xfonts-wqy &&\
-# now the microsoft core fonts
-    echo "Installing microsoft core fonts." &&\
-    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections &&\
-    echo "ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note" | debconf-set-selections &&\
-    curl --output "/tmp/ttf-mscorefonts-installer.deb" "http://ftp.de.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.7_all.deb" &&\
-    (apt install -f -y --no-install-recommends "/tmp/ttf-mscorefonts-installer.deb" || true) &&\
-    rm -f "/tmp/ttf-mscorefonts-installer.deb" &&\
-# we make sure to contain the EULA in our container
-    curl --output "/root/mscorefonts-eula" "http://corefonts.sourceforge.net/eula.htm" &&\
-    echo "Installing TeX Live and ghostscript and other tools." &&\
 # install TeX Live and ghostscript as well as other tools
     apt-get install -f -y --no-install-recommends \
           biber \
@@ -163,7 +152,6 @@ RUN echo "Initial update." &&\
     (find /usr/share/ -type f -empty -delete || true) &&\
     (find /usr/share/ -type d -empty -delete || true) &&\
     mkdir -p /usr/share/texmf/source &&\
-    mkdir -p /usr/share/texlive/texmf-dist/source &&\
-    echo "All done."
+    mkdir -p /usr/share/texlive/texmf-dist/source 
 
-ADD scripts /bin/
+RUN echo "All done."
